@@ -75,7 +75,7 @@ class holmesTests: XCTestCase {
         do {
             let dict = [
                 "roller": [
-                    "brand": "new",
+                    "brand": NSNull(), // "new",
                     "speed": 12345678,
                 ] as AnyObject
             ] as AnyObject

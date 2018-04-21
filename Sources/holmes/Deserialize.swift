@@ -46,6 +46,10 @@ public func deserialize<T: Deserialize>(from dict: AnyObject, key: String) throw
         return nil
     }
 
+    if value is NSNull {
+        return nil
+    }
+
     return try T.from(json: value)
 }
 
