@@ -5,26 +5,6 @@ public protocol Deserialize {
     static func from(json: AnyObject) throws -> Self
 }
 
-extension UUID: Deserialize {
-    public static func from(json: AnyObject) throws -> UUID {
-        guard let s = json as? String, let uuid = UUID(uuidString: s) else {
-            throw DeserializeError.custom(message: "malformed UUID: \(json)")
-        }
-
-        return uuid
-    }
-}
-
-extension Date: Deserialize {
-    public static func from(json: AnyObject) throws -> Date {
-        guard let s = json as? String, let date = DateFormatter.rfc3339.date(from: s) else {
-            throw DeserializeError.custom(message: "malformed date: \(json)")
-        }
-
-        return date
-    }
-}
-
 public func deserialize<T>(from dict: AnyObject, key: String) throws -> T {
     throw DeserializeError.notDeserializable
 }
@@ -53,6 +33,26 @@ public func deserialize<T: Deserialize>(from dict: AnyObject, key: String) throw
     return try T.from(json: value)
 }
 
+extension UUID: Deserialize {
+    public static func from(json: AnyObject) throws -> UUID {
+        guard let s = json as? String, let uuid = UUID(uuidString: s) else {
+            throw DeserializeError.custom(message: "malformed UUID: \(json)")
+        }
+
+        return uuid
+    }
+}
+
+extension Date: Deserialize {
+    public static func from(json: AnyObject) throws -> Date {
+        guard let s = json as? String, let date = DateFormatter.rfc3339.date(from: s) else {
+            throw DeserializeError.custom(message: "malformed date: \(json)")
+        }
+
+        return date
+    }
+}
+
 extension NSNull: Deserialize {
     public static func from(json: AnyObject) throws -> Self {
         guard json is NSNull else {
@@ -71,106 +71,104 @@ extension NSNumber: Deserialize {
     }
 }
 
-/*
 extension Bool: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Bool {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.boolValue
+        return value.boolValue
     }
 }
 
 extension Int: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Int {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.intValue
+        return value.intValue
     }
 }
 
 extension Int8: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Int8 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.int8Value
+        return value.int8Value
     }
 }
 
 extension Int16: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Int16 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.int16Value
+        return value.int16Value
     }
 }
 
 extension Int32: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Int32 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.int32Value
+        return value.int32Value
     }
 }
 
 extension Int64: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Int64 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.int64Value
+        return value.int64Value
     }
 }
 
 extension UInt: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> UInt {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.uintValue
+        return value.uintValue
     }
 }
 
 extension UInt8: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> UInt8 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.uint8Value
+        return value.uint8Value
     }
 }
 
 extension UInt16: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> UInt16 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.uint16Value
+        return value.uint16Value
     }
 }
 
 extension UInt32: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> UInt32 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.uint32Value
+        return value.uint32Value
     }
 }
 
 extension UInt64: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> UInt64 {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.uint64Value
+        return value.uint64Value
     }
 }
-*/
 
 extension Float: Deserialize {
     public static func from(json: AnyObject) throws -> Float {
@@ -181,34 +179,32 @@ extension Float: Deserialize {
     }
 }
 
-/*
 extension Double: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Double {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self = value.doubleValue
+        return value.doubleValue
     }
 }
 
 extension CGFloat: Deserialize {
-    public init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> CGFloat {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        self.init(value.doubleValue)
+        return CGFloat(value.doubleValue)
     }
 }
 
 extension NSString: Deserialize {
-    public convenience init(json: AnyObject) throws {
+    public static func from(json: AnyObject) throws -> Self {
         guard let value = json as? NSString else {
             throw DeserializeError.typeMismatch
         }
-        self = value
+        return self.init(string: value as String)
     }
 }
-*/
 
 extension String: Deserialize {
     public static func from(json: AnyObject) throws -> String {
