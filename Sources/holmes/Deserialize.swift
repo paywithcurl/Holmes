@@ -234,3 +234,32 @@ extension Array: Deserialize {
         }
     }
 }
+
+extension NSDictionary: Deserialize {
+    public static func from(json: AnyObject) throws -> Self {
+        guard let value = json as? [AnyHashable: AnyObject] else {
+            throw DeserializeError.typeMismatch
+        }
+
+        return self.init(dictionary: value)
+    }
+}
+
+extension Dictionary: Deserialize {
+    public static func from(json: AnyObject) throws -> Dictionary {
+        guard let dict = json as? [AnyHashable: AnyObject] else {
+            throw DeserializeError.typeMismatch
+        }
+
+        var result: [Key: Value] = [:]
+
+        for (key, value) in dict {
+            let newKey: Key   = try deserializer()(key   as AnyObject)
+            let newVal: Value = try deserializer()(value as AnyObject)
+
+            result[newKey] = newVal
+        }
+
+        return result
+    }
+}

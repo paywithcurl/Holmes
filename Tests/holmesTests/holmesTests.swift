@@ -73,13 +73,19 @@ class holmesTests: XCTestCase {
 
     func testDeserialize() {
         do {
-            let dict = [
-                "roller": [
-                    "brand": "new",
-                    "speed": 12345678,
-                ] as AnyObject
+            let rollers = [
+                "rollers": [
+                    [
+                        "brand": "new",
+                        "speed": 12345678,
+                    ] as AnyObject,
+                    [
+                        "brand": "old",
+                        "speed": 4224,
+                    ] as AnyObject,
+                ]
             ] as AnyObject
-            let x: LollerRoller = try deserialize(from: dict, key: "roller")
+            let x: [String: [LollerRoller]] = try deserializer()(rollers)
             print("x = \(x)")
         } catch {
             print("Exception: \(error)")
