@@ -5,8 +5,12 @@ public protocol Deserialize {
     static func from(json: AnyObject) throws -> Self
 }
 
-public func deserialize<T>(from dict: AnyObject, key: String) throws -> T {
-    throw DeserializeError.notDeserializable
+public func deserializer<T>() -> (AnyObject) throws -> T {
+    if let x = T.self as? Deserialize.Type {
+        return { try x.from(json: $0) as! T } // did I mention Swift's type system is stupid?
+    } else {
+        return { _ in throw DeserializeError.notDeserializable }
+    }
 }
 
 public func deserialize<T: Deserialize>(from dict: AnyObject, key: String) throws -> T {
@@ -17,48 +21,22 @@ public func deserialize<T: Deserialize>(from dict: AnyObject, key: String) throw
     return try T.from(json: dict[key] as AnyObject)
 }
 
-public func deserialize<T: Deserialize>(from dict: AnyObject, key: String) throws -> T? {
-    guard let dict = dict as? [AnyHashable: AnyObject] else {
-        throw DeserializeError.structNotDictionaryRepr
-    }
-
-    guard let value = dict[key] else {
-        return nil
-    }
-
-    if value is NSNull {
-        return nil
-    }
-
-    return try T.from(json: value)
-}
-
-extension UUID: Deserialize {
-    public static func from(json: AnyObject) throws -> UUID {
-        guard let s = json as? String, let uuid = UUID(uuidString: s) else {
-            throw DeserializeError.custom(message: "malformed UUID: \(json)")
-        }
-
-        return uuid
-    }
-}
-
-extension Date: Deserialize {
-    public static func from(json: AnyObject) throws -> Date {
-        guard let s = json as? String, let date = DateFormatter.rfc3339.date(from: s) else {
-            throw DeserializeError.custom(message: "malformed date: \(json)")
-        }
-
-        return date
-    }
-}
-
 extension NSNull: Deserialize {
     public static func from(json: AnyObject) throws -> Self {
         guard json is NSNull else {
             throw DeserializeError.typeMismatch
         }
         return self.init()
+    }
+}
+
+extension Optional: Deserialize {
+    public static func from(json: AnyObject) throws -> Optional {
+        if json is NSNull {
+            return nil
+        }
+
+        return try deserializer()(json) as Wrapped
     }
 }
 
@@ -212,5 +190,47 @@ extension String: Deserialize {
             throw DeserializeError.typeMismatch
         }
         return value as String
+    }
+}
+
+extension UUID: Deserialize {
+    public static func from(json: AnyObject) throws -> UUID {
+        guard let s = json as? String, let uuid = UUID(uuidString: s) else {
+            throw DeserializeError.custom(message: "malformed UUID: \(json)")
+        }
+
+        return uuid
+    }
+}
+
+extension Date: Deserialize {
+    public static func from(json: AnyObject) throws -> Date {
+        guard let s = json as? String, let date = DateFormatter.rfc3339.date(from: s) else {
+            throw DeserializeError.custom(message: "malformed date: \(json)")
+        }
+
+        return date
+    }
+}
+
+extension NSArray: Deserialize {
+    public static func from(json: AnyObject) throws -> Self {
+        guard let value = json as? NSArray else {
+            throw DeserializeError.typeMismatch
+        }
+
+        return self.init(array: value as [AnyObject])
+    }
+}
+
+extension Array: Deserialize {
+    public static func from(json: AnyObject) throws -> Array {
+        guard let value = json as? NSArray else {
+            throw DeserializeError.typeMismatch
+        }
+
+        return try value.map {
+            try deserializer()($0 as AnyObject)
+        }
     }
 }
