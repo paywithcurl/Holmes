@@ -45,7 +45,16 @@ extension NSNumber: Deserialize {
         guard let value = json as? NSNumber else {
             throw DeserializeError.typeMismatch
         }
-        return self.init(value: value.int64Value)
+
+        if
+          value.objCType[0] == Character("f").unicodeScalars.first!.value
+          ||
+          value.objCType[0] == Character("d").unicodeScalars.first!.value
+        {
+            return self.init(value: value.doubleValue)
+        } else {
+            return self.init(value: value.int64Value)
+        }
     }
 }
 
@@ -195,7 +204,9 @@ extension String: Deserialize {
 
 extension UUID: Deserialize {
     public static func from(json: AnyObject) throws -> UUID {
-        guard let s = json as? String, let uuid = UUID(uuidString: s) else {
+        guard let s = json as? NSString,
+              let uuid = UUID(uuidString: s as String)
+        else {
             throw DeserializeError.custom(message: "malformed UUID: \(json)")
         }
 
@@ -205,7 +216,9 @@ extension UUID: Deserialize {
 
 extension Date: Deserialize {
     public static func from(json: AnyObject) throws -> Date {
-        guard let s = json as? String, let date = DateFormatter.rfc3339.date(from: s) else {
+        guard let s = json as? NSString,
+              let date = DateFormatter.rfc3339.date(from: s as String)
+        else {
             throw DeserializeError.custom(message: "malformed date: \(json)")
         }
 
