@@ -91,7 +91,7 @@ class holmesTests: XCTestCase {
             print("Exception: \(error)")
         }
     }
-    
+
     static var allTests = [
         ("Serialize", testSerialize),
         ("Deserialize", testDeserialize),
