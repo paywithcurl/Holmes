@@ -291,6 +291,6 @@ extension Set: Deserialize {
             throw DeserializeError.typeMismatch
         }
 
-        return try Set(value.map { try deserialize($0 as AnyObject) })
+        return Set(try value.map { try deserialize($0 as AnyObject) })
     }
 }
