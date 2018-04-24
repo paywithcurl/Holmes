@@ -5,11 +5,11 @@ public protocol Deserialize {
     static func from(json: AnyObject) throws -> Self
 }
 
-public func deserializer<T>() -> (AnyObject) throws -> T {
-    if let x = T.self as? Deserialize.Type {
-        return { try x.from(json: $0) as! T } // did I mention Swift's type system is stupid?
+public func deserialize<T>(_ json: AnyObject) throws -> T {
+    if let ty = T.self as? Deserialize.Type {
+        return try ty.from(json: json) as! T // did I mention Swift's type system is stupid?
     } else {
-        return { _ in throw DeserializeError.notDeserializable }
+        throw DeserializeError.notDeserializable
     }
 }
 
@@ -36,7 +36,7 @@ extension Optional: Deserialize {
             return nil
         }
 
-        return try deserializer()(json) as Wrapped
+        return try deserialize(json) as Wrapped
     }
 }
 
@@ -242,9 +242,7 @@ extension Array: Deserialize {
             throw DeserializeError.typeMismatch
         }
 
-        return try value.map {
-            try deserializer()($0 as AnyObject)
-        }
+        return try value.map { try deserialize($0 as AnyObject) }
     }
 }
 
@@ -267,12 +265,32 @@ extension Dictionary: Deserialize {
         var result: [Key: Value] = [:]
 
         for (key, value) in dict {
-            let newKey: Key   = try deserializer()(key   as AnyObject)
-            let newVal: Value = try deserializer()(value as AnyObject)
+            let newKey: Key   = try deserialize(key   as AnyObject)
+            let newVal: Value = try deserialize(value as AnyObject)
 
             result[newKey] = newVal
         }
 
         return result
+    }
+}
+
+extension NSSet: Deserialize {
+    public static func from(json: AnyObject) throws -> Self {
+        guard let value = json as? NSArray else {
+            throw DeserializeError.typeMismatch
+        }
+
+        return self.init(array: value as [AnyObject])
+    }
+}
+
+extension Set: Deserialize {
+    public static func from(json: AnyObject) throws -> Set {
+        guard let value = json as? NSArray else {
+            throw DeserializeError.typeMismatch
+        }
+
+        return try Set(value.map { try deserialize($0 as AnyObject) })
     }
 }

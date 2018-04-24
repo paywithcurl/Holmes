@@ -191,6 +191,32 @@ extension Dictionary: Serialize {
     }
 }
 
+extension NSSet: Serialize {
+    public func toJSON() throws -> AnyObject {
+        let elements: [Any] = try self.map {
+            guard let elem = $0 as AnyObject as? Serialize else {
+                throw SerializeError.setItemNotSerializable
+            }
+
+            return try elem.toJSON()
+        }
+        return elements as NSArray
+    }
+}
+
+extension Set: Serialize {
+    public func toJSON() throws -> AnyObject {
+        let elements: [Any] = try self.map {
+            guard let elem = $0 as AnyObject as? Serialize else {
+                throw SerializeError.setItemNotSerializable
+            }
+
+            return try elem.toJSON()
+        }
+        return elements as NSArray
+    }
+}
+
 extension UUID: Serialize {
     public func toJSON() throws -> AnyObject {
         return self.uuidString.lowercased() as AnyObject

@@ -3,6 +3,7 @@ import Foundation
 public enum SerializeError: Error {
     case optionalWrappedValueNotSerializable
     case arrayItemNotSerializable
+    case setItemNotSerializable
     case dictionaryValueNotSerializable
     case dictionaryKeyNotString
     case custom(message: String)
@@ -22,7 +23,9 @@ extension SerializeError: CustomStringConvertible {
         case .optionalWrappedValueNotSerializable:
             return "Wrapped value of Optional does not conform to `Serialize`"
         case .arrayItemNotSerializable:
-            return "Array item does does not conform to `Serialize`"
+            return "Array item does not conform to `Serialize`"
+        case .setItemNotSerializable:
+            return "Set item does not conform to `Serialize`"
         case .dictionaryValueNotSerializable:
             return "Dictionary value does not conform to `Serialize`"
         case .dictionaryKeyNotString:

@@ -1,9 +1,15 @@
 import XCTest
 @testable import Holmes
 
-struct LollerRoller {
+struct LollerRoller: Hashable, Equatable {
     let brand: String?
     let speed: Float
+
+    var hashValue: Int { return (brand?.hashValue ?? 0) ^ speed.hashValue }
+}
+
+func ==(lhs: LollerRoller, rhs: LollerRoller) -> Bool {
+    return lhs.brand == rhs.brand && lhs.speed == rhs.speed
 }
 
 extension LollerRoller: Serialize, Deserialize {
@@ -24,7 +30,7 @@ extension LollerRoller: Serialize, Deserialize {
 
 struct RollerStore {
     let address: String
-    let rollers: [LollerRoller]
+    let rollers: Set<LollerRoller>
 }
 
 extension RollerStore: Serialize {
@@ -85,7 +91,7 @@ class holmesTests: XCTestCase {
                     ] as AnyObject,
                 ]
             ] as AnyObject
-            let x: [String: [LollerRoller]] = try deserializer()(rollers)
+            let x: [String: Set<LollerRoller>] = try deserialize(rollers)
             print("x = \(x)")
         } catch {
             print("Exception: \(error)")
