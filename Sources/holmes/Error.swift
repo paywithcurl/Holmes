@@ -37,6 +37,7 @@ public enum DeserializeError: Error {
     case typeMismatch
     case notDeserializable
     case structNotDictionaryRepr
+    case enumNotStringRepr(enumName: String)
     case unknownVariant(enumName: String, variantName: String)
     case custom(message: String)
 }
@@ -57,9 +58,11 @@ extension DeserializeError: CustomStringConvertible {
         case .notDeserializable:
             return "Type is not deserializable"
         case .structNotDictionaryRepr:
-            return "Tried to deserialize struct or class from a non-Dictionary representation"
+            return "Tried to deserialize struct or class from a non-`Dictionary` representation"
+        case .enumNotStringRepr(let enumName):
+            return "Tried to deserialize `enum \(enumName)` from a non-`String` representation"
         case .unknownVariant(let enumName, let variantName):
-            return "Unknown variant: \(enumName).\(variantName)"
+            return "Unknown variant: `\(enumName).\(variantName)`"
         case .custom(let message):
             return "Deserialization error: \(message)"
         }
