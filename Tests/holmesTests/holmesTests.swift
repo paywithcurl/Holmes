@@ -1,5 +1,5 @@
 import XCTest
-@testable import holmes
+@testable import Holmes
 
 struct LollerRoller {
     let brand: String?
