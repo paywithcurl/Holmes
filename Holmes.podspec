@@ -1,7 +1,7 @@
 # coding: utf-8
 Pod::Spec.new do |s|
   s.name = "Holmes"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
   s.summary = "`Serialize` and `Deserialize` traits to be used with Sherlock."
   s.author = { "Árpád Goretity" => "h2co3@h2co3.org" }
   s.license = { :type => "MIT" }

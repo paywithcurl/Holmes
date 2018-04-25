@@ -202,6 +202,18 @@ extension String: Deserialize {
     }
 }
 
+extension NSUUID: Deserialize {
+    public static func from(json: AnyObject) throws -> Self {
+        guard let s = json as? NSString,
+              let uuid = self.init(uuidString: s as String)
+        else {
+            throw DeserializeError.custom(message: "malformed UUID: \(json)")
+        }
+
+        return uuid
+    }
+}
+
 extension UUID: Deserialize {
     public static func from(json: AnyObject) throws -> UUID {
         guard let s = json as? NSString,
@@ -211,6 +223,18 @@ extension UUID: Deserialize {
         }
 
         return uuid
+    }
+}
+
+extension NSDate: Deserialize {
+    public static func from(json: AnyObject) throws -> Self {
+        guard let s = json as? NSString,
+              let date = DateFormatter.rfc3339.date(from: s as String)
+        else {
+            throw DeserializeError.custom(message: "malformed date: \(json)")
+        }
+
+        return self.init(timeInterval: 0.0, since: date) // `Date as NSDate` coercion doesn't work (???!!!)
     }
 }
 

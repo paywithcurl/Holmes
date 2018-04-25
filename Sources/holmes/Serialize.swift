@@ -217,9 +217,21 @@ extension Set: Serialize {
     }
 }
 
+extension NSUUID: Serialize {
+    public func toJSON() throws -> AnyObject {
+        return self.uuidString.lowercased() as AnyObject
+    }
+}
+
 extension UUID: Serialize {
     public func toJSON() throws -> AnyObject {
         return self.uuidString.lowercased() as AnyObject
+    }
+}
+
+extension NSDate: Serialize {
+    public func toJSON() throws -> AnyObject {
+        return DateFormatter.rfc3339.string(from: self as Date) as AnyObject
     }
 }
 
